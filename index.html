@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>Ruta Miel · Vicente López</title>
+<style>
+  :root{
+    --bg:#FBF7EE;--card:#FFFFFF;--ink:#2A2118;--muted:#8A7E6B;
+    --honey:#E0A52E;--honey-deep:#B9791A;--line:#ECE3D2;
+    --alta:#3E7D3A;--media:#C98A12;--baja:#9A9285;
+    --done:#EAF3E6;--done-line:#BBD9B0;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0}
+  body{background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    padding:0 0 92px;-webkit-font-smoothing:antialiased;}
+  header{position:sticky;top:0;z-index:20;
+    background:linear-gradient(180deg,#FBF7EE 72%,rgba(251,247,238,0));
+    padding:calc(env(safe-area-inset-top) + 16px) 18px 10px;}
+  .brand{display:flex;align-items:baseline;gap:10px}
+  .brand h1{font-size:23px;margin:0;letter-spacing:-.02em;font-weight:800}
+  .brand .hex{font-size:22px}
+  .brand small{color:var(--muted);font-weight:600;font-size:12.5px;margin-left:auto}
+  .progress{margin-top:12px;height:9px;border-radius:99px;background:#EFE7D6;
+    overflow:hidden;border:1px solid var(--line)}
+  .progress>i{display:block;height:100%;width:0;
+    background:linear-gradient(90deg,var(--honey),var(--honey-deep));transition:width .3s}
+  .meta{display:flex;justify-content:space-between;margin-top:7px;
+    font-size:12.5px;color:var(--muted);font-weight:600}
+  .filters{display:flex;gap:8px;padding:6px 18px 2px;overflow-x:auto;scrollbar-width:none}
+  .filters::-webkit-scrollbar{display:none}
+  .chip{flex:0 0 auto;border:1.5px solid var(--line);background:var(--card);
+    padding:7px 14px;border-radius:99px;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer}
+  .chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  main{padding:8px 14px 0}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;
+    padding:15px 15px 13px;margin-bottom:12px;position:relative;
+    box-shadow:0 1px 0 rgba(42,33,24,.03)}
+  .card.done{background:var(--done);border-color:var(--done-line)}
+  .card.done .name{text-decoration:line-through;opacity:.55}
+  .top{display:flex;align-items:flex-start;gap:12px}
+  .order{flex:0 0 auto;width:30px;height:30px;border-radius:9px;
+    background:#FBF1DC;color:var(--honey-deep);font-weight:800;font-size:14px;
+    display:grid;place-items:center;margin-top:2px}
+  .card.done .order{background:var(--done-line);color:#3E5A38}
+  .head{flex:1;min-width:0}
+  .name{font-size:17.5px;font-weight:800;letter-spacing:-.01em;line-height:1.15;margin:0}
+  .sub{margin:3px 0 0;font-size:13px;color:var(--muted);font-weight:600}
+  .badges{display:flex;gap:6px;align-items:center;margin-top:8px;flex-wrap:wrap}
+  .b{font-size:11.5px;font-weight:800;padding:3px 9px;border-radius:99px}
+  .b.alta{background:#E7F1E3;color:var(--alta)}
+  .b.media{background:#FBF0D6;color:var(--media)}
+  .b.baja{background:#EFECE4;color:var(--baja)}
+  .b.dist{background:#F3EDDF;color:#8A7E6B}
+  .desc{margin:11px 0 0;font-size:14px;line-height:1.45;color:#4A4032}
+  .tip{margin:9px 0 0;font-size:13px;line-height:1.4;color:var(--honey-deep);
+    background:#FCF4E2;border-radius:10px;padding:8px 10px;font-weight:600}
+  .tip b{font-weight:800}
+  .actions{display:flex;gap:9px;margin-top:13px}
+  .btn{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;
+    padding:12px 8px;border-radius:12px;font-size:14.5px;font-weight:800;
+    text-decoration:none;border:none;cursor:pointer}
+  .btn.map{background:var(--ink);color:#fff}
+  .btn.call{background:#fff;color:var(--ink);border:1.5px solid var(--line)}
+  .btn.call.off{opacity:.4;pointer-events:none}
+  .btn svg{width:17px;height:17px}
+  .check{margin-top:10px;width:100%;padding:11px;border-radius:12px;cursor:pointer;
+    font-size:14px;font-weight:800;border:1.5px dashed var(--honey);
+    background:#fff;color:var(--honey-deep)}
+  .card.done .check{border:1.5px solid var(--done-line);background:#fff;color:#3E7D3A}
+  .empty{text-align:center;color:var(--muted);padding:40px 20px;font-weight:600}
+  footer{position:fixed;left:0;right:0;bottom:0;z-index:20;
+    background:rgba(251,247,238,.92);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+    border-top:1px solid var(--line);
+    padding:11px 16px calc(env(safe-area-inset-bottom) + 11px);
+    display:flex;gap:10px;align-items:center}
+  footer .all{flex:1;text-align:center;background:var(--honey);color:#fff;border:none;
+    padding:13px;border-radius:13px;font-size:14.5px;font-weight:800;cursor:pointer;
+    text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px}
+  .reset{background:none;border:none;color:var(--muted);font-size:13px;font-weight:700;cursor:pointer;padding:6px}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><span class="hex">&#127855;</span><h1>Ruta Miel</h1>
+  <small>Vicente L&oacute;pez &middot; 1,5 km</small></div>
+  <div class="progress"><i id="bar"></i></div>
+  <div class="meta"><span id="count">0 visitados</span><span id="left">&mdash; por visitar</span></div>
+</header>
+<div class="filters" id="filters">
+  <div class="chip on" data-f="todos">Todos</div>
+  <div class="chip" data-f="Alta">&#11088; Prioridad alta</div>
+  <div class="chip" data-f="pend">Pendientes</div>
+  <div class="chip" data-f="Diet">Diet&eacute;ticas/Almac&eacute;n</div>
+  <div class="chip" data-f="Fiamb">Fiambres/Quesos</div>
+  <div class="chip" data-f="Verd">Verduler&iacute;as</div>
+  <div class="chip" data-f="Pan">Panader&iacute;as</div>
+  <div class="chip" data-f="Carn">Carnicer&iacute;as</div>
+</div>
+<main id="list"></main>
+<footer>
+  <a class="all" id="routeAll" target="_blank" rel="noopener">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="10" r="3"/><path d="M12 21s-7-6.3-7-11a7 7 0 0 1 14 0c0 4.7-7 11-7 11z"/></svg>
+    Ver ruta en Maps</a>
+  <button class="reset" id="reset">Reiniciar</button>
+</footer>
+<script>
+var DATA = [{"n": "Capaz que vuelvo", "cat": "Almacén de barrio", "dir": "25 de Mayo 772", "prio": "Media", "dist": "~150 m", "tel": "+541137905793", "g": "https://www.google.com/maps/place/?q=place_id:ChIJC51Vde-3vJURND59ouzeccc", "d": "Almacén de barrio a la vuelta. Ideal para relación de confianza y venta directa.", "tip": "A 150 m de tu casa. En Maps figura como bazar: confirmá rubro al entrar."}, {"n": "El Origen de Todo", "cat": "Dietética / natural", "dir": "Agustín Álvarez 1504", "prio": "Alta", "dist": "~270 m", "tel": "+541152756308", "g": "https://www.google.com/maps/place/?q=place_id:ChIJk0IhJLG2vJURQe69RNd_9yc", "d": "Saludables, frutos secos, agroecológicos por mayor y menor. 4.8★.", "tip": "Excelente target y muy cerca. Buscan productos de productor."}, {"n": "Despensa Vilo (Nodo UTT)", "cat": "Almacén agroecológico", "dir": "Roca 852", "prio": "Alta", "dist": "~450 m", "tel": "+541128259199", "g": "https://www.google.com/maps/place/?q=place_id:ChIJy_rVzhWxvJURkXeRxsNPMjg", "d": "Productores locales: yerba, aceite, verduras. La miel artesanal encaja perfecto.", "tip": "Tu mejor target. Mencioná que es de productor."}, {"n": "Mercado de Fiambres", "cat": "Fiambrería", "dir": "Roca 831", "prio": "Baja", "dist": "~450 m", "tel": "", "g": "https://www.google.com/maps/place/?q=place_id:ChIJfWa6G82xvJURTC0MlC4_ouI", "d": "Fiambres y quesos de barrio.", "tip": "Miel + quesos: probá ofrecer combo."}, {"n": "queso.feta", "cat": "Quesería / delicatessen", "dir": "Roca 1474", "prio": "Alta", "dist": "~480 m", "tel": "", "g": "https://www.google.com/maps/place/?q=place_id:ChIJR5K6M0uxvJURK-2o3YI9O_c", "d": "Quesos de autor (feta, cabra, oveja), fiambres premium. 4.9★.", "tip": "Maridaje queso+miel es su mundo. Dejá frasco de muestra."}, {"n": "Carnicería La Número 1", "cat": "Carnicería", "dir": "Roca 772", "prio": "Baja", "dist": "~500 m", "tel": "+541164780222", "g": "https://www.google.com/maps/place/?q=place_id:ChIJVRv2HZuxvJURk2M4PJES5OY", "d": "Carnicería de barrio con buena clientela.", "tip": "Pasás por la puerta camino a otros."}, {"n": "Fan de Pan", "cat": "Panadería", "dir": "Roca 794", "prio": "Media", "dist": "~500 m", "tel": "+541140267064", "g": "https://www.google.com/maps/place/?q=place_id:ChIJPXzsZC2xvJURrs9Kg-EYESU", "d": "Panadería con buena variedad y precio.", "tip": "Miel para repostería o venta en mostrador."}, {"n": "La Amistad Frutas y Verduras", "cat": "Verdulería", "dir": "Roca 783", "prio": "Media", "dist": "~500 m", "tel": "+541147918391", "g": "https://www.google.com/maps/place/?q=place_id:ChIJX_8ZnlKxvJURyqRlR4Az7vM", "d": "Frutas y verduras, buena variedad.", "tip": ""}, {"n": "Mundo Verde", "cat": "Verdulería + almacén", "dir": "Maipú 1113", "prio": "Alta", "dist": "~550 m", "tel": "+541158246744", "g": "https://www.google.com/maps/place/?q=place_id:ChIJ80pCNQC3vJURGwj06tyiNcc", "d": "Verdulería con almacén, mercadería fresca, local nuevo y prolijo.", "tip": ""}, {"n": "Dietéticas Tomy", "cat": "Dietética (cadena)", "dir": "Maipú 201", "prio": "Alta", "dist": "~600 m", "tel": "+541147197600", "g": "https://www.google.com/maps/place/?q=place_id:ChIJ5T5yi7q2vJURk7cOx5LIRiE", "d": "Cadena reconocida: frutos secos, harinas, legumbres, endulzantes. Alta rotación.", "tip": "Si hablás con el encargado, puede abrir volumen estructurado."}, {"n": "Naturvida", "cat": "Dietética", "dir": "Roca 1489", "prio": "Alta", "dist": "~600 m", "tel": "", "g": "https://www.google.com/maps/place/?q=place_id:ChIJGQfSTUuxvJURJ59LISInJR4", "d": "Dietética con comida vegana y productos naturales.", "tip": "Preguntá por Ana o Pedro."}, {"n": "Verdulería El Tambobambino", "cat": "Verdulería", "dir": "Maipú 929", "prio": "Media", "dist": "~600 m", "tel": "+541133697116", "g": "https://www.google.com/maps/place/?q=place_id:ChIJC8kV7Sm3vJURO8LXBeZ9OV8", "d": "Frutería de barrio, calidad alta, todos los medios de pago.", "tip": "Dueño Miller, atento."}, {"n": "LA PANADERIA", "cat": "Panadería", "dir": "Maipú 1293", "prio": "Media", "dist": "~600 m", "tel": "+541165911293", "g": "https://www.google.com/maps/place/?q=place_id:ChIJEb69I0uxvJUR-yKGNUJLHxo", "d": "Panadería y confitería con take away.", "tip": ""}, {"n": "Verdulería Dietética Eva Leiva", "cat": "Verdulería + dietética", "dir": "Maipú 810", "prio": "Media", "dist": "~700 m", "tel": "+541165666006", "g": "https://www.google.com/maps/place/?q=place_id:ChIJlSnM4XC3vJURHgvXF6bHrbI", "d": "Verdulería con sector dietética y frutos secos. Góndolas mixtas.", "tip": "Manejan lista por WhatsApp."}, {"n": "Carrefour Market", "cat": "Supermercado", "dir": "Maipú 940", "prio": "Baja", "dist": "~700 m", "tel": "+548004448484", "g": "https://www.google.com/maps/place/?q=place_id:ChIJPXxXcLS2vJURhELW_TMOMbo", "d": "Súper de cercanía, volumen masivo. Ingreso a góndola es proceso largo.", "tip": "Más para mirar competencia en góndola que para vender ya."}, {"n": "Verdulería El Cordobés", "cat": "Verdulería", "dir": "Maipú 448", "prio": "Baja", "dist": "~750 m", "tel": "+541134805588", "g": "https://www.google.com/maps/place/?q=place_id:ChIJ1Qu2PwC3vJURuoZ2Q4v6Ycg", "d": "Verdulería de barrio, ofertas, todos los medios de pago.", "tip": ""}, {"n": "Pastene Deli", "cat": "Fiambrería / deli", "dir": "Monasterio 402", "prio": "Alta", "dist": "~750 m", "tel": "+541147915182", "g": "https://www.google.com/maps/place/?q=place_id:ChIJG-UgyK-2vJUR4qMmg4fBk1Y", "d": "Quesos, fiambres y take away. Clientela fiel para picadas.", "tip": "Venta cruzada miel + quesos duros. Buen lugar para muestra."}, {"n": "La Picadita de Vicente López", "cat": "Picadas / fiambres", "dir": "Maipú 1553", "prio": "Media", "dist": "~850 m", "tel": "+541147973442", "g": "https://www.google.com/maps/place/?q=place_id:ChIJCQEdR0qxvJURG7o5PVFDFLs", "d": "Tablas armadas, fiambres, quesos, conservas, vinos.", "tip": "Miel para picadas agridulces o frascos en góndola."}, {"n": "Confiterías Viegener", "cat": "Pastelería", "dir": "Maipú 1480", "prio": "Media", "dist": "~850 m", "tel": "+541147912666", "g": "https://www.google.com/maps/place/?q=place_id:ChIJAYMuV0qxvJURHLPLZcaNDbs", "d": "Confitería clásica de alta rotación, catering y delivery.", "tip": ""}, {"n": "Salumeria Saverio", "cat": "Fiambrería premium", "dir": "Maipú 1601", "prio": "Alta", "dist": "~900 m", "tel": "", "g": "https://www.google.com/maps/place/?q=place_id:ChIJh1cyQYKxvJURX13yOxZzZro", "d": "Quesos y fiambres de calidad, focaccias.", "tip": "Apuntá a lo gourmet/premium."}, {"n": "La Lonja de Vicente López", "cat": "Carnicería", "dir": "Maipú 602", "prio": "Baja", "dist": "~950 m", "tel": "+541147917211", "g": "https://www.google.com/maps/place/?q=place_id:ChIJjSRfOrG2vJURjMaX4P53Rvs", "d": "Cortes vacunos, cerdo, pollo, achuras. (Antes buscado como 'Vacarne').", "tip": "Miel cerca de caja: ingrediente para marinados/asado."}, {"n": "Finca Baires", "cat": "Carnicería premium / regional", "dir": "Maipú 442", "prio": "Media", "dist": "~1.0 km", "tel": "+541136102816", "g": "https://www.google.com/maps/place/?q=place_id:ChIJVfEB67C2vJURg7qwRLvaV_4", "d": "Carnes premium, embutidos, quesos finos, productos regionales.", "tip": "Perfil regional encaja con miel artesanal presentable."}, {"n": "UTT Nodo Florida", "cat": "Almacén agroecológico", "dir": "Chacabuco 563", "prio": "Alta", "dist": "~1.0 km", "tel": "+541144951642", "g": "https://www.google.com/maps/place/?q=place_id:ChIJr66vHxO3vJURTseyng3dktY", "d": "Verduras y productos agroecológicos de productores.", "tip": "Mismo perfil que Vilo. Encaja muy bien."}, {"n": "Ecologicxs Almacén Sustentable", "cat": "Almacén granel", "dir": "Yrigoyen 1418", "prio": "Alta", "dist": "~1.1 km", "tel": "+541168240481", "g": "https://www.google.com/maps/place/?q=place_id:ChIJ55zjA7uxvJURdGVMX_-yxEI", "d": "Venta a granel, eco-sustentable, agroecológico.", "tip": "Atiende el dueño Pablo. Concepto ideal para miel."}, {"n": "Con Aroma a Pan – Mercado Bio", "cat": "Almacén orgánico", "dir": "Lavalle 1965", "prio": "Alta", "dist": "~1.1 km", "tel": "+541145193632", "g": "https://www.google.com/maps/place/?q=place_id:ChIJ-VQERci2vJURnbzmOz3hTPc", "d": "Orgánicos: verduras, carnes, lácteos, pan.", "tip": "Preguntá por Federico."}, {"n": "Fausto's", "cat": "Wine bar + deli", "dir": "Av. del Libertador 1574", "prio": "Media", "dist": "~1.1 km", "tel": "+5491121755791", "g": "https://www.google.com/maps/place/?q=place_id:ChIJHWaEGk6xvJURtflolhdSwKQ", "d": "Vinos y picadas gourmet.", "tip": "Canal para miel premium."}, {"n": "Hojarasca", "cat": "Dietética / gourmet", "dir": "Laprida 1505", "prio": "Alta", "dist": "~1.1 km", "tel": "+541133614363", "g": "https://www.google.com/maps/place/?q=place_id:ChIJm20veLq2vJUR6r34O9xZ6AQ", "d": "Naturales, gourmet, snacks saludables. Ambiente estético.", "tip": "Presentá la miel como producto premium/diferencial."}, {"n": "Carnicería Florida", "cat": "Carnicería", "dir": "Laprida 1528", "prio": "Media", "dist": "~1.2 km", "tel": "+541123768009", "g": "https://www.google.com/maps/place/?q=place_id:ChIJPQRSFoa3vJUR_m6j8hib6Uw", "d": "Carnes frescas, granja, pollo. 4.8★, atiende el dueño.", "tip": "Exhibidor chico en mostrador rota por recomendación del carnicero."}, {"n": "Estancia San Andrés", "cat": "Fiambrería / quesería", "dir": "Maipú 289", "prio": "Media", "dist": "~1.3 km", "tel": "+5448370020", "g": "https://www.google.com/maps/place/?q=place_id:ChIJcWy5fbq2vJUR4_uafxaTc4M", "d": "Fiambres, quesos artesanales, panes, vinos, regionales.", "tip": "Queso + miel: clásico. Dejá folleto o muestra."}, {"n": "La Finca de Saavedra", "cat": "Autoservicio", "dir": "Maipú 285", "prio": "Baja", "dist": "~1.3 km", "tel": "+541147950850", "g": "https://www.google.com/maps/place/?q=place_id:ChIJoyPgfbq2vJURmh-2bgVQYPg", "d": "Autoservicio grande, frutas y verduras, delivery.", "tip": ""}, {"n": "Carnes Vicente López", "cat": "Carnicería + almacén", "dir": "Maipú 299", "prio": "Baja", "dist": "~1.3 km", "tel": "+541140435837", "g": "https://www.google.com/maps/place/?q=place_id:ChIJJy5HQd23vJURbgkEYDPf9L4", "d": "Carnicería con productos de almacén. Buena concurrencia.", "tip": "Complementos dulces/conservas a la vista rotan bien."}, {"n": "Estación Pan", "cat": "Panadería", "dir": "Maipú 31", "prio": "Baja", "dist": "~1.4 km", "tel": "+541168155250", "g": "https://www.google.com/maps/place/?q=place_id:ChIJjWL2Gbu2vJURlumbqzzCI7c", "d": "Panadería familiar, buena relación precio-calidad.", "tip": ""}];
+var KEY="ruta_miel_v2",estado={},filtro="todos";
+try{estado=JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){estado={}}
+var PIN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="10" r="3"/><path d="M12 21s-7-6.3-7-11a7 7 0 0 1 14 0c0 4.7-7 11-7 11z"/></svg>';
+var PHONE='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.6A2 2 0 0 1 4.1 2H7a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8.1 9.8a16 16 0 0 0 6 6l1.3-1.1a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.7.7A2 2 0 0 1 22 16.9z"/></svg>';
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;")}
+function matches(c){
+  if(filtro==="todos")return true;
+  if(filtro==="pend")return !estado[c.n];
+  if(filtro==="Alta")return c.prio==="Alta";
+  if(filtro==="Diet")return /Diet|Almac|granel|org|agroecol|natural/i.test(c.cat);
+  if(filtro==="Fiamb")return /Fiamb|deli|Picadas|wine|ques/i.test(c.cat);
+  if(filtro==="Verd")return /Verdul|Autoservicio|Super/i.test(c.cat);
+  if(filtro==="Pan")return /Panad|Pastel/i.test(c.cat);
+  if(filtro==="Carn")return /Carnic/i.test(c.cat);
+  return true;
+}
+function render(){
+  var list=document.getElementById("list"),vis=DATA.filter(matches),i;
+  list.innerHTML="";
+  if(!vis.length){list.innerHTML='<div class="empty">Nada en este filtro.<br>Toc&aacute; &laquo;Todos&raquo;.</div>'}
+  for(i=0;i<vis.length;i++){
+    var c=vis[i],idx=DATA.indexOf(c)+1,done=!!estado[c.n];
+    var pc=c.prio==="Alta"?"alta":c.prio==="Media"?"media":"baja";
+    var tel=c.tel?'<a class="btn call" href="tel:'+c.tel+'">'+PHONE+'Llamar</a>':'<span class="btn call off">'+PHONE+'Sin tel.</span>';
+    var tip=c.tip?'<p class="tip"><b>Tip:</b> '+esc(c.tip)+'</p>':'';
+    var el=document.createElement("div");
+    el.className="card"+(done?" done":"");
+    el.innerHTML='<div class="top"><div class="order">'+idx+'</div><div class="head">'+
+      '<p class="name">'+esc(c.n)+'</p><p class="sub">'+esc(c.cat)+' &middot; '+esc(c.dir)+'</p>'+
+      '<div class="badges"><span class="b '+pc+'">'+c.prio+'</span><span class="b dist">'+esc(c.dist)+'</span></div>'+
+      '</div></div><p class="desc">'+esc(c.d)+'</p>'+tip+
+      '<div class="actions"><a class="btn map" href="'+c.g+'" target="_blank" rel="noopener">'+PIN+'Maps</a>'+tel+'</div>'+
+      '<button class="check" data-n="'+esc(c.n)+'">'+(done?"&#10003; Visitado":"Marcar visitado")+'</button>';
+    list.appendChild(el);
+  }
+  var b=document.querySelectorAll(".check");
+  for(i=0;i<b.length;i++){b[i].onclick=function(){var n=this.getAttribute("data-n");if(estado[n])delete estado[n];else estado[n]=Date.now();save();render()}}
+  updateBar();
+}
+function updateBar(){
+  var total=DATA.length,done=DATA.filter(function(c){return estado[c.n]}).length;
+  document.getElementById("bar").style.width=(done/total*100)+"%";
+  document.getElementById("count").textContent=done+" visitado"+(done===1?"":"s");
+  document.getElementById("left").textContent=(total-done)+" por visitar";
+}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(estado))}catch(e){}}
+document.getElementById("filters").onclick=function(e){
+  var chip=e.target.closest?e.target.closest(".chip"):null;if(!chip)return;
+  var ch=document.querySelectorAll(".chip"),k;for(k=0;k<ch.length;k++)ch[k].classList.remove("on");
+  chip.classList.add("on");filtro=chip.getAttribute("data-f");render();
+};
+document.getElementById("reset").onclick=function(){
+  if(confirm("¿Borrar todos los marcados?")){estado={};save();render()}
+};
+var ORIG="25 de Mayo 648, Vicente Lopez";
+var pts=DATA.map(function(c){return encodeURIComponent(c.dir+", Vicente Lopez")});
+var dest=pts[pts.length-1],way=pts.slice(0,-1).slice(0,9).join("|");
+document.getElementById("routeAll").href=
+ "https://www.google.com/maps/dir/?api=1&origin="+encodeURIComponent(ORIG)+
+ "&destination="+dest+"&travelmode=walking&waypoints="+way;
+render();
+</script>
+</body></html>
